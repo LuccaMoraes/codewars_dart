@@ -1,4 +1,4 @@
-import 'challenge06-testing.dart';
+import 'challenge06-testSuite.dart';
 
 void main() {
   /*

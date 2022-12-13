@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'challenge06.dart';
+import 'challenge06-screen_locking_patterns.dart';
 
 
 void main (){

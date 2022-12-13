@@ -1,0 +1,104 @@
+import 'package:flutter/material.dart';
+import 'dart:math';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Ultimate Dollynator',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+      ),
+      home: MyCustomForm(),
+    );
+  }
+}
+
+// Define a custom Form widget.
+class MyCustomForm extends StatefulWidget {
+  const MyCustomForm({super.key});
+
+  @override
+  State<MyCustomForm> createState() => _MyCustomFormState();
+}
+
+// Define a corresponding State class.
+// This class holds the data related to the Form.
+class _MyCustomFormState extends State<MyCustomForm> {
+  // Create a text controller and use it to retrieve the current value
+  // of the TextField.
+  final myController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Ultimate Dollynator'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: TextField(
+          controller: myController,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        // When the user presses the button, show an alert dialog containing
+        // the text that the user has entered into the text field.
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                // Retrieve the text the that user has entered by using the
+                // TextEditingController.
+                content: Text(dollynator(myController.text)),
+              );
+            },
+          );
+        },
+        tooltip: 'Traduzir para dollynês',
+        child: const Icon(Icons.text_fields),
+      ),
+    );
+  }
+}
+
+String dollynator(String s) {
+  String texto = s.toLowerCase();
+  String ans = '';
+
+  for (int i = 0; i < texto.length; i++) {
+    Random().nextBool()
+        ? ans += empobrecedor(texto[i])
+        : ans += empobrecedor(texto[i]).toUpperCase();
+  }
+
+  return ans;
+}
+
+String empobrecedor(String s) {
+
+  switch(s){
+    case 'i': return 'y';
+    case 'e': return 'i';
+    case 'm': return 'n';
+    case 'n': return 'm';
+    case 'á': return 'ah';
+    case 'ó': return 'oh';
+    case 'é': return 'eh';
+  }
+
+  return s;
+}

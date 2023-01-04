@@ -1,8 +1,8 @@
 void main() {
   
-  int n = 325;
+  int n = 3373;
 
-  print(subtractSum(10));
+  print(subtractSum(n));
 }
 
 String subtractSum(int n){
@@ -16,7 +16,7 @@ String subtractSum(int n){
 
   n -= sum;
 
-  if(n>=1 || n <=100){
+  if(n>0 && n <=100){
     return fruits[n];
   }
 

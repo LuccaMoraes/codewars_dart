@@ -1,8 +1,4 @@
-void main(){
-
-
-  runTester();
-}
+void main() => runTester();
 
 List tribonacci(List<num> signature, int n) {
   List result = signature;
@@ -14,11 +10,7 @@ List tribonacci(List<num> signature, int n) {
   return result.sublist(0,n);
 }
 
-void tester(signature, n, result){
-  print('${tribonacci(signature, n)}' == '${result}');
-  // print(tribonacci(signature, n));
-  // print(result);
-}
+void tester(signature, n, result) => print('${tribonacci(signature, n)}' == '${result}');
 
 void runTester(){
   tester([1, 1, 1], 10, [1, 1, 1, 3, 5, 9, 17, 31, 57, 105]);

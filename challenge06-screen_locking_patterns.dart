@@ -82,7 +82,7 @@ Set<String> findAllValidPerms() {
     }
 
     for (int i = pointer; i < lst.length; i++) {
-      List permutation = List.from(lst);
+      List permutation = lst.toList();
       permutation[pointer] = lst[i];
       permutation[i] = lst[pointer];
       permutate(permutation, pointer + 1);

@@ -2,14 +2,51 @@ void main(){
 
   //https://www.codewars.com/kata/54d7660d2daf68c619000d95/train/dart
 
-  tester();
+  //tester();
+  print(great_common_divisor([48,24,16,12]));
 
 }
 
 // Some fractions need to be simplified
 String convertFrac(lst) {
-  // your code
+  /*
+     n1/d1    n2/d2   n3/d3
+  [ [2 , 4], [1, 3], [1, 4] ];
+  d1*d2*d3 = 48 = mult
+  n1*(mult/d1) = 24
+  24/48 = 2/4
+  n2*(mult/d2) = 16
+  16/48 = 1/3
+  n3*(mult/d3) = 12
+  12/48 = 1/4
+  
+  localizar MDC(48,24,16,12) = 4
+                24,12,08,06
+                12,06,04,03
+  
+  
+  */
+
+  
   return "";
+}
+
+int great_common_divisor(List<int> numlst){
+  
+  int smallestNumber = numlst[0]; 
+
+  for(int n in numlst){
+    n < smallestNumber ? smallestNumber = n:null;
+  }
+
+  for(int i = 0 ; i < numlst.length; i++){
+    if(numlst[i]%smallestNumber!=0){
+      smallestNumber--;
+      i = 0;
+    }
+  }
+
+  return smallestNumber;
 }
 
 void tester(){

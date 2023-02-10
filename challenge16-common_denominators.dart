@@ -3,7 +3,11 @@ void main(){
   //https://www.codewars.com/kata/54d7660d2daf68c619000d95/train/dart
 
   //tester();
-  print(great_common_divisor([48,24,16,12]));
+  //print(great_common_divisor([48,24,16,12]));
+  print(great_common_divisor([18078,34060,2262,34060,25545,34060]));
+
+  var lst = [ [2, 4], [1, 3], [1, 4] ];
+  //convertFrac(lst);
 
 }
 
@@ -21,26 +25,64 @@ String convertFrac(lst) {
   12/48 = 1/4
   
   localizar MDC(48,24,16,12) = 4
-                24,12,08,06
-                12,06,04,03
   
+  24/48, 16/48, 12/48
+  /4
+  6/12, 4/12, 3/12
   
   */
 
-  
-  return "";
-}
+  List <int> numerators = [];
+  int denominatorsProduct = 1;
 
-int great_common_divisor(List<int> numlst){
-  
-  int smallestNumber = numlst[0]; 
-
-  for(int n in numlst){
-    n < smallestNumber ? smallestNumber = n:null;
+  for(List<int> fraction in lst){
+    denominatorsProduct = denominatorsProduct*fraction[1];
   }
 
-  for(int i = 0 ; i < numlst.length; i++){
-    if(numlst[i]%smallestNumber!=0){
+  for(int i = 0; i<lst.length; i++){
+    numerators.add(lst[i][0]*(denominatorsProduct/lst[i][1]).floor());
+  }
+
+  List <int> allNumbers = numerators;
+  allNumbers.add(denominatorsProduct);
+
+  int gcd = great_common_divisor(allNumbers);
+
+  List <int> allNumbersReduced = [];
+  for(int n in allNumbers){
+    allNumbersReduced.add((n/gcd).floor());
+  }
+
+  final int d = allNumbersReduced.last;
+  allNumbersReduced.removeLast();
+
+  final List ans = [];
+  for(int n in allNumbersReduced){
+    ans.add([n,d]);
+  }
+
+  //print(ans);
+  
+  return "$ans"
+  .replaceAll(' ', '')
+  .replaceAll('],[', ')(')
+  .replaceAll('[', '(')
+  .replaceAll(']', ')')
+  .replaceAll('((', '(')
+  .replaceAll('))', ')');
+
+}
+
+int great_common_divisor(List<int> numlst) {
+  // TODO: there might be a bug in this code, must test it further
+  int smallestNumber = numlst[0];
+
+  for (int n in numlst) {
+    n < smallestNumber ? smallestNumber = n : null;
+  }
+
+  for (int i = 0; i < numlst.length; i++) {
+    if (numlst[i] % smallestNumber != 0) {
       smallestNumber--;
       i = 0;
     }

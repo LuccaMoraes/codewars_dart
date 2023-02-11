@@ -3,11 +3,7 @@ void main(){
   //https://www.codewars.com/kata/54d7660d2daf68c619000d95/train/dart
 
   //tester();
-  //print(great_common_divisor([48,24,16,12]));
-  //print(great_common_divisor([17,24,32,240,10,480]));
-  //print(great_common_divisor([18078,34060,2262,34060,25545,34060,]));
-  print(numReducer([4,8,12]));
-
+  
   //var lst = [ [2, 4], [1, 3], [1, 4] ];
   //convertFrac(lst);
 
@@ -34,41 +30,30 @@ void main(){
 
 // Some fractions need to be simplified
 String convertFrac(lst) {
-  List<int> numerators = [];
-  int denominatorsProduct = 1;
-  final List ans = [];
+  List<List<int>> reducedNumLst = [];
 
-  for (List<int> fraction in lst) {
-    denominatorsProduct = denominatorsProduct * fraction[1];
+  for(List<int> fraction in lst){
+    reducedNumLst.add(reducedFraction(fraction));
   }
 
-  for (int i = 0; i < lst.length; i++) {
-    numerators.add(lst[i][0] * (denominatorsProduct / lst[i][1]).floor());
-  }
-
-  List<int> allNumbers = numerators;
-  allNumbers.add(denominatorsProduct);
-
-  int gcd = great_common_divisor(allNumbers);
-
-  List<int> allNumbersReduced = [];
-  for (int n in allNumbers) {
-    allNumbersReduced.add((n / gcd).floor());
-  }
-
-  final int d = allNumbersReduced.last;
-  allNumbersReduced.removeLast();
 
   
-  for (int n in allNumbersReduced) {
-    ans.add([n, d]);
+  return replaced('');
+
+}
+
+List<int> reducedFraction(List<int> fraction){
+  int a = fraction[0];
+  int b = fraction[1];
+
+  while(b!=0){
+    int temp = b;
+    b = a % b;
+    a = temp;
   }
+  int gcd = a;
 
-  //print(ans);
-  
-
-  return replaced('$ans');
-
+  return [fraction[0]~/gcd,fraction[1]~/gcd];
 }
 
 String replaced(String s){
@@ -80,60 +65,6 @@ String replaced(String s){
       .replaceAll('))', ')');
 }
 
-
-
-int great_common_divisor(List<int> numlst) {
-  int smallestNumber = numlst[0];
-
-  for (int n in numlst) {
-    if(isPrime(n) && n != 2) return 1;
-    n < smallestNumber ? smallestNumber = n : null;
-  }
-
-  for (int i = 0; i < numlst.length; i++) {
-    if(isPrime(numlst[i]) && numlst[i] != 2) return 1;
-    if (numlst[i] % smallestNumber != 0) {
-      //TODO: this is extremely ineficient!
-      //must find a way to find great common divisor exponentially faster
-      smallestNumber--;
-      i = -1;
-    }
-    print(smallestNumber);
-  }
-
-  return smallestNumber;
-}
-
-List<int> numReducer(List<int> numlst) {
-  List<int> reducedNumbers = [];
-
-
-  for(int i = 0, divisor = 2; i < numlst.length; i++){
-    if(numlst[i]%divisor == 0){
-      reducedNumbers.add((numlst[i]/divisor).round());
-      divisor++;
-      i = -1;
-    }else{
-      divisor++;
-      i = -1;
-    }
-  }
-
-
-
-  return reducedNumbers;
-}
-
-bool isPrime(n) {
-  if (n == 2) return true;
-  if (n % 2 == 0) return false;
-
-  for (int i = 3; i < n; i++) {
-    if (n % i == 0) return false;
-  }
-
-  return true;
-}
 
 void tester(){
 

@@ -2,10 +2,11 @@ void main(){
 
   //https://www.codewars.com/kata/54d7660d2daf68c619000d95/train/dart
 
-  tester();
+  //tester();
   //print(great_common_divisor([48,24,16,12]));
   //print(great_common_divisor([17,24,32,240,10,480]));
   //print(great_common_divisor([18078,34060,2262,34060,25545,34060,]));
+  print(numReducer([4,8,12]));
 
   //var lst = [ [2, 4], [1, 3], [1, 4] ];
   //convertFrac(lst);
@@ -101,6 +102,26 @@ int great_common_divisor(List<int> numlst) {
   }
 
   return smallestNumber;
+}
+
+List<int> numReducer(List<int> numlst) {
+  List<int> reducedNumbers = [];
+
+
+  for(int i = 0, divisor = 2; i < numlst.length; i++){
+    if(numlst[i]%divisor == 0){
+      reducedNumbers.add((numlst[i]/divisor).round());
+      divisor++;
+      i = -1;
+    }else{
+      divisor++;
+      i = -1;
+    }
+  }
+
+
+
+  return reducedNumbers;
 }
 
 bool isPrime(n) {

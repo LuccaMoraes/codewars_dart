@@ -40,7 +40,6 @@ String convertFrac(lst) {
     reducedNumLst.add(reducedFraction(fraction));
   }
 
-
   for (List<int> fraction in reducedNumLst) {
     denominatorsProduct = denominatorsProduct * fraction[1];
   }
@@ -48,7 +47,7 @@ String convertFrac(lst) {
   for (int i = 0; i < reducedNumLst.length; i++) {
     numerators.add(reducedNumLst[i][0] * (denominatorsProduct / reducedNumLst[i][1]).floor());
   }
-
+  
   List<int> allNumbers = numerators;
   allNumbers.add(denominatorsProduct);
 

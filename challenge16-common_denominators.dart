@@ -2,7 +2,7 @@ void main(){
 
   //https://www.codewars.com/kata/54d7660d2daf68c619000d95/train/dart
 
-  //tester();
+  tester();
   
   //var lst = [ [2, 4], [1, 3], [1, 4] ];
   //convertFrac(lst);
@@ -30,16 +30,80 @@ void main(){
 
 // Some fractions need to be simplified
 String convertFrac(lst) {
+  
   List<List<int>> reducedNumLst = [];
+  List<int> numerators = [];
+  int denominatorsProduct = 1;
+  final List ans = [];
 
   for(List<int> fraction in lst){
     reducedNumLst.add(reducedFraction(fraction));
   }
 
 
-  
-  return replaced('');
+  for (List<int> fraction in reducedNumLst) {
+    denominatorsProduct = denominatorsProduct * fraction[1];
+  }
 
+  for (int i = 0; i < reducedNumLst.length; i++) {
+    numerators.add(reducedNumLst[i][0] * (denominatorsProduct / reducedNumLst[i][1]).floor());
+  }
+
+  List<int> allNumbers = numerators;
+  allNumbers.add(denominatorsProduct);
+
+  int gcd = great_common_divisor(allNumbers);
+
+  List<int> allNumbersReduced = [];
+  for (int n in allNumbers) {
+    allNumbersReduced.add((n / gcd).floor());
+  }
+
+  final int d = allNumbersReduced.last;
+  allNumbersReduced.removeLast();
+
+  
+  for (int n in allNumbersReduced) {
+    ans.add([n, d]);
+  }
+
+  //print(ans);
+  
+
+  return replaced('$ans');
+}
+
+int great_common_divisor(List<int> numlst) {
+  int smallestNumber = numlst[0];
+
+  for (int n in numlst) {
+    if(isPrime(n) && n != 2) return 1;
+    n < smallestNumber ? smallestNumber = n : null;
+  }
+
+  for (int i = 0; i < numlst.length; i++) {
+    if(isPrime(numlst[i]) && numlst[i] != 2) return 1;
+    if (numlst[i] % smallestNumber != 0) {
+      //TODO: this is extremely ineficient!
+      //must find a way to find great common divisor exponentially faster
+      smallestNumber--;
+      i = -1;
+    }
+    //print(smallestNumber);
+  }
+
+  return smallestNumber;
+}
+
+bool isPrime(n) {
+  if (n == 2) return true;
+  if (n % 2 == 0) return false;
+
+  for (int i = 3; i < n; i++) {
+    if (n % i == 0) return false;
+  }
+
+  return true;
 }
 
 List<int> reducedFraction(List<int> fraction){
@@ -96,4 +160,7 @@ void dotest(List lst, String ans){
     print('got ${convertFrac(lst)}');
     print('');
   }
+
+
 }
+

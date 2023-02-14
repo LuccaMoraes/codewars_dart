@@ -8,7 +8,6 @@ void main(){
   //convertFrac(lst);
 
   /*
-
      n1/d1    n2/d2   n3/d3
   [ [2 , 4], [1, 3], [1, 4] ];
   d1*d2*d3 = 48 = mult
@@ -31,7 +30,7 @@ void main(){
 
 String convertFrac(lst) {
 
-  //creeates a newlist with the simplified fractions
+  // creeates a newlist with the simplified fractions
   List<List<int>> reducedNumLst = [];
   for(List<int> fraction in lst){
     reducedNumLst.add(reducedFraction(fraction));
@@ -43,22 +42,18 @@ String convertFrac(lst) {
     denominators.add(fraction[1]);
   }
 
-  //multiplies all denominators
-  int dProduct = 1;
-  for(int d in denominators){
-    dProduct = dProduct * d;
-  }
+  //finds the lowest common multiple of all denominators
+  int lcm = lcmOf(denominators);
 
-  //multiplies each numerator by the quocient of dProduct/d1
-  //creates a multiplied list of all fractions with the same base
-  List<List<int>> sameBaseFractions = [];
+  //creates a list with the fractions scaled to the same denominators
+  List<List<int>> sameDenominatorFractions = [];
   for(List<int> fraction in reducedNumLst){
-    sameBaseFractions.add([fraction[0]*(dProduct~/fraction[1]), dProduct]);
+    sameDenominatorFractions.add(
+      [fraction[0]*(lcm~/fraction[1]),lcm]
+    );
   }
 
-  //
-
-  return replaced('');
+  return replaced('$sameDenominatorFractions');
 }
 
 int lcmOf (List<int> numlst){

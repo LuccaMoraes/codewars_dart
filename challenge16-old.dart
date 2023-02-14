@@ -37,7 +37,7 @@ String convertFrac(lst) {
   List<int> numerators = [];
   int denominatorsProduct = 1;
   final List ans = [];
-
+  
   for (List<int> fraction in lst) {
     denominatorsProduct = denominatorsProduct * fraction[1];
   }
@@ -107,7 +107,6 @@ int great_common_divisor(List<int> numlst) {
 List<int> numReducer(List<int> numlst) {
   List<int> reducedNumbers = [];
 
-
   for(int i = 0, divisor = 2; i < numlst.length; i++){
     if(numlst[i]%divisor == 0){
       reducedNumbers.add((numlst[i]/divisor).round());
@@ -118,9 +117,6 @@ List<int> numReducer(List<int> numlst) {
       i = -1;
     }
   }
-
-
-
   return reducedNumbers;
 }
 

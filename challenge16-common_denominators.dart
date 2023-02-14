@@ -7,7 +7,9 @@ void main(){
   //var lst = [ [2, 4], [1, 3], [1, 4] ];
   //convertFrac(lst);
 
-    /*
+  print(great_common_divisor([4,8,16,2,]));
+
+  /*
      n1/d1    n2/d2   n3/d3
   [ [2 , 4], [1, 3], [1, 4] ];
   d1*d2*d3 = 48 = mult
@@ -34,18 +36,20 @@ String convertFrac(lst) {
   List<List<int>> reducedNumLst = [];
   List<int> numerators = [];
   int denominatorsProduct = 1;
-  final List ans = [];
+  List ans = [];
 
+  print(lst);
   for(List<int> fraction in lst){
     reducedNumLst.add(reducedFraction(fraction));
   }
-
+  print(reducedNumLst);
+/*
   for (List<int> fraction in reducedNumLst) {
     denominatorsProduct = denominatorsProduct * fraction[1];
   }
 
   for (int i = 0; i < reducedNumLst.length; i++) {
-    numerators.add(reducedNumLst[i][0] * (denominatorsProduct / reducedNumLst[i][1]).floor());
+    numerators.add(reducedNumLst[i][0] * denominatorsProduct ~/ reducedNumLst[i][1]);
   }
   
   List<int> allNumbers = numerators;
@@ -68,41 +72,69 @@ String convertFrac(lst) {
 
   //print(ans);
   
-
+*/
   return replaced('$ans');
 }
 
 int great_common_divisor(List<int> numlst) {
+  numlst.sort();
+  Set numSet = numlst.toSet();
   int smallestNumber = numlst[0];
 
-  for (int n in numlst) {
-    if(isPrime(n) && n != 2) return 1;
-    n < smallestNumber ? smallestNumber = n : null;
-  }
-
-  for (int i = 0; i < numlst.length; i++) {
-    if(isPrime(numlst[i]) && numlst[i] != 2) return 1;
-    if (numlst[i] % smallestNumber != 0) {
-      //TODO: this is extremely ineficient!
-      //must find a way to find great common divisor exponentially faster
-      smallestNumber--;
-      i = -1;
+  for (int n in numSet) {
+    if (n % smallestNumber != 0) break;
+    if (n % smallestNumber == 0 && numSet.last == n) {
+      return smallestNumber;
     }
-    //print(smallestNumber);
   }
 
-  return smallestNumber;
+  List<Set<int>> allFactors = [];
+
+  for (int n in numSet) {
+    allFactors.add(primeFactors(n));
+  }
+
+  return commonFactor(allFactors);
 }
 
-bool isPrime(n) {
-  if (n == 2) return true;
-  if (n % 2 == 0) return false;
+Set<int> primeFactors(int num) {
+  if (num == 1) return {1};
+  int n = 2;
+  Set<int> factors = {};
+  while (n * n <= num) {
+    if (num % n == 0) {
+      factors.add(n);
+      num = num ~/ n;
+    } else {
+      n++;
+    }
+  }
+  if (num > 1) {
+    factors.add(num);
+  }
+  return factors;
+}
 
-  for (int i = 3; i < n; i++) {
-    if (n % i == 0) return false;
+int commonFactor(List<Set<int>> superset) {
+  List<int> common = superset[0].toList();
+
+  for (Set<int> set in superset) {
+    for (int num in superset[0]) {
+      if (!set.contains(num)) {
+        common.remove(num);
+      }
+    }
   }
 
-  return true;
+  if (common.length > 1) {
+    List commonInOrder = common.toList();
+    commonInOrder.sort();
+    return commonInOrder.last;
+  } else if (common.length == 1) {
+    return common.toList()[0];
+  } else {
+    return 1;
+  }
 }
 
 List<int> reducedFraction(List<int> fraction){

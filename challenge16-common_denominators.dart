@@ -115,12 +115,11 @@ List<int> multiplesOf(int n, int largestInt, int limit) {
   
   int start = largestInt - (largestInt % n) + n;
   List<int> multiples = [start];
-  int steps = 0;
+  
   while (multiples.last < limit) {
-    steps++;
     multiples.add(multiples.last + n);
   }
-  //print(steps);
+  
   return multiples.sublist(1);
 }
 

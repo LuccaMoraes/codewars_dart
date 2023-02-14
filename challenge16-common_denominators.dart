@@ -33,23 +33,27 @@ void main(){
 // Some fractions need to be simplified
 String convertFrac(lst) {
   
-  List<List<int>> reducedNumLst = [];
-  List<int> numerators = [];
-  int denominatorsProduct = 1;
+  
+  
+  
   List ans = [];
 
-  print(lst);
+  // creeates a newlist with the siplified fractions
+  List<List<int>> reducedNumLst = [];
   for(List<int> fraction in lst){
     reducedNumLst.add(reducedFraction(fraction));
   }
-  print(reducedNumLst);
-/*
+  
+  // multiplies all denominators
+  int denominatorsProduct = 1;
   for (List<int> fraction in reducedNumLst) {
     denominatorsProduct = denominatorsProduct * fraction[1];
   }
 
+
+  List<int> numerators = [];
   for (int i = 0; i < reducedNumLst.length; i++) {
-    numerators.add(reducedNumLst[i][0] * denominatorsProduct ~/ reducedNumLst[i][1]);
+    numerators.add(reducedNumLst[i][0] * (denominatorsProduct ~/ reducedNumLst[i][1]));
   }
   
   List<int> allNumbers = numerators;
@@ -72,7 +76,7 @@ String convertFrac(lst) {
 
   //print(ans);
   
-*/
+
   return replaced('$ans');
 }
 

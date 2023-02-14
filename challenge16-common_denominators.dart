@@ -28,94 +28,98 @@ void main(){
   */
 
 }
-
 String convertFrac(lst) {
-
-  //creeates a newlist with the simplified fractions
+  
+  // creates a newlist with the simplified fractions
   List<List<int>> reducedNumLst = [];
-  for(List<int> fraction in lst){
+  for (List<int> fraction in lst) {
     reducedNumLst.add(reducedFraction(fraction));
   }
-  
+
   //creates a list of all denominators
   List<int> denominators = [];
-  for(List<int> fraction in reducedNumLst){
+  for (List<int> fraction in reducedNumLst) {
     denominators.add(fraction[1]);
   }
 
-  //multiplies all denominators
-  int dProduct = 1;
-  for(int d in denominators){
-    dProduct = dProduct * d;
+  //finds the lowest common multiple of all denominators
+  int lcm = lcmOf(denominators);
+
+  //creates a list with the fractions scaled to the same denominators
+  List<List<int>> sameDenominatorFractions = [];
+  for (List<int> fraction in reducedNumLst) {
+    sameDenominatorFractions.add([fraction[0] * (lcm ~/ fraction[1]), lcm]);
   }
 
-  //multiplies each numerator by the quocient of dProduct/d1
-  //creates a multiplied list of all fractions with the same base
-  List<List<int>> sameBaseFractions = [];
-  for(List<int> fraction in reducedNumLst){
-    sameBaseFractions.add([fraction[0]*(dProduct~/fraction[1]), dProduct]);
-  }
-
-  //
-
-  return replaced('');
+  return replaced('$sameDenominatorFractions');
 }
 
-int lcmOf (List<int> numlst){
+int lcmOf(List<int> numlst) {
   numlst = numlst.toSet().toList(); // removes duplicates
   numlst.sort(); //orders list from smallest to largest number
 
+  //rules out trivial cases
+  for (int n in numlst) {
+    if (numlst.last % n != 0) {
+      break;
+    } else {
+      if (numlst.last % n == 0 && numlst.last == n) {
+        return numlst.last;
+      }
+    }
+  }
+
   //sets the limit for the multiplication
   int limit = 1;
-  for(int n in numlst){
-    limit = limit*n;
+  for (int n in numlst) {
+    limit = limit * n;
   }
 
-  //creates the lists of list of multiples
+  //creates the list of lists of multiples
   List<List<int>> multiplesList = [];
-  for(int n in numlst){
-    multiplesList.add(multiplesOf(n,numlst.last, limit));
+  for (int n in numlst) {
+    multiplesList.add(multiplesOf(n, numlst.last, limit));
   }
-  
+
   //finds the common multiples between numbers
   Set<int> unique = multiplesList[0].toSet();
-  for(List multiples in multiplesList){
+  for (List multiples in multiplesList) {
     unique = unique.intersection(multiples.toSet());
   }
-  
+
   //returns the smallest multiple
-  return unique.toList()[1];
+  return unique.toList()[0];
 }
 
-List<int> multiplesOf(int n, int start, int limit){
-  //TODO: needs heavy optimization!!!
-  List<int> factors = [start];
-  int steps =0;
-  while(factors.last < limit){
-    steps++;
-    factors.add(factors.last+n);
+List<int> multiplesOf(int n, int largestInt, int limit) {
+  
+  int start = largestInt - (largestInt % n);
+  List<int> multiples = [start];
+  
+  while (multiples.last < limit) {
+    multiples.add(multiples.last + n);
   }
-  print(steps);
-  return factors;
+  
+  return multiples.sublist(1);
 }
 
-
-List<int> reducedFraction(List<int> fraction){
+List<int> reducedFraction(List<int> fraction) {
   int a = fraction[0];
   int b = fraction[1];
 
-  while(b!=0){
+  while (b != 0) {
     int temp = b;
     b = a % b;
     a = temp;
   }
   int gcd = a;
 
-  return [fraction[0]~/gcd,fraction[1]~/gcd];
+  return [fraction[0] ~/ gcd, fraction[1] ~/ gcd];
 }
 
-String replaced(String s){
-  return s.replaceAll('[', '(')
+String replaced(String s) {
+  return s
+      .replaceAll('[', '(')
       .replaceAll(']', ')')
       .replaceAll(' ', '')
       .replaceAll('),(', ')(')

@@ -2,10 +2,12 @@ void main(){
 
   //https://www.codewars.com/kata/54d7660d2daf68c619000d95/train/dart
 
+  
   tester();
   
-  //var lst = [ [2, 4], [1, 3], [1, 4] ];
-  //convertFrac(lst);
+
+  //var test = [[37, 81], [37, 56], [74, 224], [370, 560], [37, 74], [111, 123]];
+  //print(convertFrac(test));
 
   /*
 
@@ -93,13 +95,14 @@ int lcmOf(List<int> numlst) {
 
 List<int> multiplesOf(int n, int largestInt, int limit) {
   
-  int start = largestInt - (largestInt % n);
+  int start = largestInt - (largestInt % n) + n;
   List<int> multiples = [start];
-  
+  int steps = 0;
   while (multiples.last < limit) {
+    steps++;
     multiples.add(multiples.last + n);
   }
-  
+  //print(steps);
   return multiples.sublist(1);
 }
 
@@ -141,27 +144,33 @@ void tester(){
   dotest(lst, "(1480,2775)(175,2775)(444,2775)");
   lst = [ [2, 2], [3, 1], [4, 1], [5, 1] ];
   dotest(lst, "(1,1)(3,1)(4,1)(5,1)");
-  lst = [[5, 17], [5, 24], [10, 32], [50, 240], [5, 10], [100, 480]]; //timeout
+  lst = [[5, 17], [5, 24], [10, 32], [50, 240], [5, 10], [100, 480]];
   dotest(lst, "(240,816)(170,816)(255,816)(170,816)(408,816)(170,816)");
-  lst = [[87, 181], [87, 106], [174, 524], [870, 1060], [87, 174], [1740, 2120]]; //timeout
+  lst = [[87, 181], [87, 106], [174, 524], [870, 1060], [87, 174], [1740, 2120]]; // 3s +
   dotest(lst, "(1208082,2513366)(2062857,2513366)(834591,2513366)(2062857,2513366)(1256683,2513366)(2062857,2513366)");
-  lst = [[1, 100], [3, 1000], [1, 2500], [1, 20000]]; //freezes pc
-  //dotest(lst, "(200,20000)(60,20000)(8,20000)(1,20000)");
-  
+  lst = [[1, 100], [3, 1000], [1, 2500], [1, 20000]];
+  dotest(lst, "(200,20000)(60,20000)(8,20000)(1,20000)");
+  lst = [[37, 81], [37, 56], [74, 224], [370, 560], [37, 74], [111, 123]]; //6s +
+  dotest(lst, "(169904,371952)(245754,371952)(122877,371952)(245754,371952)(185976,371952)(335664,371952)");
 
 }
 
 void dotest(List lst, String ans){
+
+  var chrono = Stopwatch();
+  chrono.start();
   
   if(convertFrac(lst) == ans){
-    print('testing for $lst = \x1B[32mPASS\x1B[0m');
+    chrono.stop();
+    String ms = '${chrono.elapsedMilliseconds}';
+    print('testing for $lst = \x1B[32mPASS\x1B[0m in $ms ms');
   }else{
-    print('testing for $lst = \x1B[31mFAILED!\x1B[0m');
+    chrono.stop();
+    String ms = '${chrono.elapsedMilliseconds}';
+    print('testing for $lst = \x1B[31mFAILED!\x1B[0m in $ms ms');
     print('expected $ans');
     print('got ${convertFrac(lst)}');
     print('');
   }
-
-
 }
 

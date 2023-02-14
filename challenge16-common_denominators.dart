@@ -7,8 +7,6 @@ void main(){
   //var lst = [ [2, 4], [1, 3], [1, 4] ];
   //convertFrac(lst);
 
-  print(great_common_divisor([4,8,16,2,]));
-
   /*
      n1/d1    n2/d2   n3/d3
   [ [2 , 4], [1, 3], [1, 4] ];
@@ -30,116 +28,69 @@ void main(){
 
 }
 
-// Some fractions need to be simplified
 String convertFrac(lst) {
-  
-  
-  
-  
-  List ans = [];
 
-  // creeates a newlist with the siplified fractions
+  // creeates a newlist with the simplified fractions
   List<List<int>> reducedNumLst = [];
   for(List<int> fraction in lst){
     reducedNumLst.add(reducedFraction(fraction));
   }
   
-  // multiplies all denominators
-  int denominatorsProduct = 1;
-  for (List<int> fraction in reducedNumLst) {
-    denominatorsProduct = denominatorsProduct * fraction[1];
+  //creates a list of all denominators
+  List<int> denominators = [];
+  for(List<int> fraction in reducedNumLst){
+    denominators.add(fraction[1]);
   }
 
+  //finds the lowest common multiple of all denominators
+  int lcm = lcmOf(denominators);
 
-  List<int> numerators = [];
-  for (int i = 0; i < reducedNumLst.length; i++) {
-    numerators.add(reducedNumLst[i][0] * (denominatorsProduct ~/ reducedNumLst[i][1]));
-  }
-  
-  List<int> allNumbers = numerators;
-  allNumbers.add(denominatorsProduct);
-
-  int gcd = great_common_divisor(allNumbers);
-
-  List<int> allNumbersReduced = [];
-  for (int n in allNumbers) {
-    allNumbersReduced.add((n / gcd).floor());
+  //creates a list with the fractions scaled to the same denominators
+  List<List<int>> sameDenominatorFractions = [];
+  for(List<int> fraction in reducedNumLst){
+    sameDenominatorFractions.add(
+      [fraction[0]*(lcm~/fraction[1]),lcm]
+    );
   }
 
-  final int d = allNumbersReduced.last;
-  allNumbersReduced.removeLast();
-
-  
-  for (int n in allNumbersReduced) {
-    ans.add([n, d]);
-  }
-
-  //print(ans);
-  
-
-  return replaced('$ans');
+  return replaced('$sameDenominatorFractions');
 }
 
-int great_common_divisor(List<int> numlst) {
-  numlst.sort();
-  Set numSet = numlst.toSet();
-  int smallestNumber = numlst[0];
+int lcmOf (List<int> numlst){
+  numlst = numlst.toSet().toList(); // removes duplicates
+  numlst.sort(); //orders list from smallest to largest number
 
-  for (int n in numSet) {
-    if (n % smallestNumber != 0) break;
-    if (n % smallestNumber == 0 && numSet.last == n) {
-      return smallestNumber;
-    }
+  //sets the limit for the multiplication
+  int limit = 1;
+  for(int n in numlst){
+    limit = limit*n;
   }
 
-  List<Set<int>> allFactors = [];
-
-  for (int n in numSet) {
-    allFactors.add(primeFactors(n));
+  //creates the lists of list of multiples
+  List<List<int>> multiplesList = [];
+  for(int n in numlst){
+    multiplesList.add(multiplesOf(n, limit));
   }
-
-  return commonFactor(allFactors);
+  
+  //finds the common multiples between numbers
+  Set<int> unique = multiplesList[0].toSet();
+  for(List multiples in multiplesList){
+    unique = unique.intersection(multiples.toSet());
+  }
+  
+  //returns the smallest multiple
+  return unique.toList()[1];
 }
 
-Set<int> primeFactors(int num) {
-  if (num == 1) return {1};
-  int n = 2;
-  Set<int> factors = {};
-  while (n * n <= num) {
-    if (num % n == 0) {
-      factors.add(n);
-      num = num ~/ n;
-    } else {
-      n++;
-    }
-  }
-  if (num > 1) {
-    factors.add(num);
+
+List<int> multiplesOf(int n, int limit){
+  List<int> factors = [0];
+  while(factors.last < limit){
+    factors.add(factors.last+n);
   }
   return factors;
 }
 
-int commonFactor(List<Set<int>> superset) {
-  List<int> common = superset[0].toList();
-
-  for (Set<int> set in superset) {
-    for (int num in superset[0]) {
-      if (!set.contains(num)) {
-        common.remove(num);
-      }
-    }
-  }
-
-  if (common.length > 1) {
-    List commonInOrder = common.toList();
-    commonInOrder.sort();
-    return commonInOrder.last;
-  } else if (common.length == 1) {
-    return common.toList()[0];
-  } else {
-    return 1;
-  }
-}
 
 List<int> reducedFraction(List<int> fraction){
   int a = fraction[0];

@@ -45,7 +45,10 @@ String convertFrac(lst) {
   }
 
   //finds the lowest common multiple of all denominators
+
   int lcm = lcmOf(denominators);
+
+
 
   //creates a list with the fractions scaled to the same denominators
   List<List<int>> sameDenominatorFractions = [];
@@ -57,8 +60,10 @@ String convertFrac(lst) {
 }
 
 int lcmOf(List<int> numlst) {
+
   numlst = numlst.toSet().toList(); // removes duplicates
   numlst.sort(); //orders list from smallest to largest number
+
 
   //rules out trivial cases
   for (int n in numlst) {
@@ -82,12 +87,25 @@ int lcmOf(List<int> numlst) {
   for (int n in numlst) {
     multiplesList.add(multiplesOf(n, numlst.last, limit));
   }
-
+  
   //finds the common multiples between numbers
+  /// alternative algorithm:
+  /// orders the list from shortest to longest n of multiples
+  /// uses the shortest as the main pattern
+  /// for each n in shortest, looks for it in every other list
+  /// if a list doesnt contain n, skips the loop to next n
+  /// if the loop manages to reach the end with the same n, returns n
   Set<int> unique = multiplesList[0].toSet();
   for (List multiples in multiplesList) {
-    unique = unique.intersection(multiples.toSet());
+    var chrono = Stopwatch();
+    chrono.start();
+
+    unique = unique.intersection(multiples.toSet()); // TODO: this is extremely slow
+    
+    chrono.stop();
+    print('${chrono.elapsedMilliseconds} ms');
   }
+  
 
   //returns the smallest multiple
   return unique.toList()[0];

@@ -69,7 +69,7 @@ int lcmOf (List<int> numlst){
   //creates the lists of list of multiples
   List<List<int>> multiplesList = [];
   for(int n in numlst){
-    multiplesList.add(multiplesOf(n, limit));
+    multiplesList.add(multiplesOf(n,numlst.last, limit));
   }
   
   //finds the common multiples between numbers
@@ -82,12 +82,15 @@ int lcmOf (List<int> numlst){
   return unique.toList()[1];
 }
 
-
-List<int> multiplesOf(int n, int limit){
-  List<int> factors = [0];
+List<int> multiplesOf(int n, int start, int limit){
+  //TODO: needs heavy optimization!!!
+  List<int> factors = [start];
+  int steps =0;
   while(factors.last < limit){
+    steps++;
     factors.add(factors.last+n);
   }
+  print(steps);
   return factors;
 }
 
@@ -115,7 +118,6 @@ String replaced(String s){
       .replaceAll('))', ')');
 }
 
-
 void tester(){
 
   var lst = [ [2, 4], [1, 3], [1, 4] ];
@@ -134,14 +136,18 @@ void tester(){
   dotest(lst, "(240,816)(170,816)(255,816)(170,816)(408,816)(170,816)");
   lst = [[87, 181], [87, 106], [174, 524], [870, 1060], [87, 174], [1740, 2120]]; //timeout
   dotest(lst, "(1208082,2513366)(2062857,2513366)(834591,2513366)(2062857,2513366)(1256683,2513366)(2062857,2513366)");
+  lst = [[1, 100], [3, 1000], [1, 2500], [1, 20000]]; //freezes pc
+  dotest(lst, "(200,20000)(60,20000)(8,20000)(1,20000)");
+  
+
 }
 
 void dotest(List lst, String ans){
   
   if(convertFrac(lst) == ans){
-    print('$lst = \x1B[32mPASS\x1B[0m');
+    print('testing for $lst = \x1B[32mPASS\x1B[0m');
   }else{
-    print('$lst = \x1B[31mFAILED!\x1B[0m');
+    print('testing for $lst = \x1B[31mFAILED!\x1B[0m');
     print('expected $ans');
     print('got ${convertFrac(lst)}');
     print('');

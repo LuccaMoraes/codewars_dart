@@ -64,7 +64,6 @@ int lcmOf(List<int> numlst) {
   numlst = numlst.toSet().toList(); // removes duplicates
   numlst.sort(); //orders list from smallest to largest number
 
-
   //rules out trivial cases
   for (int n in numlst) {
     if (numlst.last % n != 0) {
@@ -87,28 +86,39 @@ int lcmOf(List<int> numlst) {
   for (int n in numlst) {
     multiplesList.add(multiplesOf(n, numlst.last, limit));
   }
-  
-  //finds the common multiples between numbers
-  /// alternative algorithm:
-  /// orders the list from shortest to longest n of multiples
-  /// uses the shortest as the main pattern
-  /// for each n in shortest, looks for it in every other list
-  /// if a list doesnt contain n, skips the loop to next n
-  /// if the loop manages to reach the end with the same n, returns n
-  Set<int> unique = multiplesList[0].toSet();
-  for (List multiples in multiplesList) {
-    var chrono = Stopwatch();
-    chrono.start();
+  var chrono = Stopwatch();
+  chrono.start();
+  //returns the first multiple found
+  int lcm = firstIntersection(multiplesList);
+  chrono.stop();
+  print('${chrono.elapsedMilliseconds} ms');
 
-    unique = unique.intersection(multiples.toSet()); // TODO: this is extremely slow
-    
-    chrono.stop();
-    print('${chrono.elapsedMilliseconds} ms');
+
+  return lcm;
+}
+
+int firstIntersection(List<List<int>> lst) {
+  // orders the list from shortest to longest n of multiples
+  lst.sort((a, b) => a.length.compareTo(b.length));
+
+  // uses the shortest as the main pattern
+  List<int> shortest = lst[0];
+
+  // for each n in shortest, looks for it in every other list
+  for (int n in shortest) {
+    for (List<int> listOfMultiples in lst) {
+      // if a list doesnt contain n, skips the loop to next n
+      if (listOfMultiples.contains(n) == false) {
+        break;
+      } else {
+        // if the loop manages to reach the end with the same n, returns n
+        if (lst.last == listOfMultiples && listOfMultiples.contains(n)) {
+          return n;
+        }
+      }
+    }
   }
-  
-
-  //returns the smallest multiple
-  return unique.toList()[0];
+  return 1;
 }
 
 List<int> multiplesOf(int n, int largestInt, int limit) {
@@ -163,13 +173,14 @@ void tester(){
   dotest(lst, "(1,1)(3,1)(4,1)(5,1)");
   lst = [[5, 17], [5, 24], [10, 32], [50, 240], [5, 10], [100, 480]];
   dotest(lst, "(240,816)(170,816)(255,816)(170,816)(408,816)(170,816)");
-  lst = [[87, 181], [87, 106], [174, 524], [870, 1060], [87, 174], [1740, 2120]]; // 3s +
+  lst = [[87, 181], [87, 106], [174, 524], [870, 1060], [87, 174], [1740, 2120]]; // 3s + => 486ms
   dotest(lst, "(1208082,2513366)(2062857,2513366)(834591,2513366)(2062857,2513366)(1256683,2513366)(2062857,2513366)");
   lst = [[1, 100], [3, 1000], [1, 2500], [1, 20000]];
   dotest(lst, "(200,20000)(60,20000)(8,20000)(1,20000)");
-  lst = [[37, 81], [37, 56], [74, 224], [370, 560], [37, 74], [111, 123]]; //6s +
+  lst = [[37, 81], [37, 56], [74, 224], [370, 560], [37, 74], [111, 123]]; //6s + => 1654ms
   dotest(lst, "(169904,371952)(245754,371952)(122877,371952)(245754,371952)(185976,371952)(335664,371952)");
-
+  lst = [[31, 69], [31, 50], [62, 188], [310, 500], [31, 62], [93, 105]]; // 3959ms
+  dotest(lst,'(509950,1135050)(703731,1135050)(374325,1135050)(703731,1135050)(567525,1135050)(1005330,1135050)');
 }
 
 void dotest(List lst, String ans){

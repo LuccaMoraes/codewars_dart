@@ -34,54 +34,57 @@ void main(){
     "(((10)))" = 10
 
 */
-String str = "6/2(1+2)";
+String str = "6/2*(1+(2))";
 //print(str);
 //print(parentheses(str));
-print(calc(str));
-
 //print(calc(str));
+
+//print(addSub('35 + 2'));
   
-//test();
+test();
 
 }//end main
 
-num calc(String s) => num.parse(addSub(multDiv(parentheses(s))));
-
+num calc(String s) => num.parse(parentheses(s));
 
 String parentheses(String s) {
-  //goes through a string and executes math operations between parentheses
-  //returning a string without any parentheses
 
-  List expr = cleaner(s).split(' ');
-  int lastOpndParIndex = 0;
-  List result = [];
+  if(!s.contains('(')) return addSub(multDiv(s));
+
+  int open = 0;
+  int close = 0;
+  String tempS = '';
   
-  for (int i = 0; i < expr.length; i++) {
-  
-    if (expr[i] == '(') {
-      lastOpndParIndex = i;
-      result.add(expr[i]);
-    } else if (expr[i] == ')' && lastOpndParIndex > 0) {
-      while (result.last != '(') {
-        result.removeLast();
+  for(int i =0; i< s.length;i++){
+    if (s[i] == '(' || s[i] == ')') {
+      s[i] == '(' ? open++ : close++;
+      
+      if( i > 0 && s[i] == '('){
+        if(isNum(s[i-1])){
+          tempS += '*';
+        }
       }
-      result.removeLast();
-      result
-          .add(addSub(multDiv(expr.join().substring(lastOpndParIndex + 1, i))));
-      lastOpndParIndex = 0;
-      print(result);
-    } else {
-      result.add(expr[i]);
     }
+    tempS += s[i];
   }
+
+  if(open!=close) return 'invalid';
   
-  if (result.join().contains(')')) {
-    return parentheses(result.join());
-  } else {
-    return result.join();
+  s = tempS;
+
+  int lastOpenPar = s.lastIndexOf('(')+1;
+  int firstClosePar = s.substring(lastOpenPar).indexOf(')');
+  String betweenPar = s.substring(lastOpenPar, firstClosePar+lastOpenPar);
+
+  s = s.replaceAll('($betweenPar)', '${addSub(multDiv(betweenPar))}');
+  if(s.contains('(')){
+    s = parentheses(s);
   }
+
+  return addSub(multDiv(s));
 }
 
+bool isNum(String s)=> '0123456789'.contains(s);
 
 
 String addSub(String expression) {
@@ -111,21 +114,21 @@ String multDiv(String s) {
   List result = [];
 
   for (int i = 0; i < expr.length; i++) {
-    if (expr[i] == '*') {
-      result.last = (num.parse(result.last) *
-              (expr[i + 1] == '-'
-                  ? num.parse(expr[i + 2]) * -1
-                  : num.parse(expr[i + 1])))
-          .toString();
+    
+    if(expr[i] == '*' || expr[i] == '/'){
+      num tempNum = expr[i + 1] == '-' ? num.parse(expr[i + 2]) * -1 : num.parse(expr[i + 1]);
+      
+      if (expr[i] == '/') {
+        result.last = (num.parse(result.last) / tempNum).toString();
+
+        if (num.parse(result.last) - num.parse(result.last).toInt() == 0) {
+          result.last = num.parse(result.last).toInt().toString();
+        }
+      } else{
+        result.last = (num.parse(result.last) * tempNum).toString();
+      }
       expr[i + 1] == '-' ? i += 2 : i++;
-    } else if (expr[i] == '/') {
-      result.last = (num.parse(result.last) /
-              (expr[i + 1] == '-'
-                  ? num.parse(expr[i + 2]) * -1
-                  : num.parse(expr[i + 1])))
-          .toString();
-      expr[i + 1] == '-' ? i += 2 : i++;
-    } else {
+    }else {
       result.add(expr[i]);
     }
   }
@@ -152,8 +155,12 @@ String cleaner(String s) {
 }
 
 
+
 void test() {
   var tests = [
+    ["(81)", 81],
+    ['12*(25+1)', 312],
+    ['2(1+2)', 6],
     ["1 + 1", 2],
     ["8/16", 0.5],
     ["3 -(-1)", 4],
@@ -161,12 +168,18 @@ void test() {
     ["10- 2- -5", 13],
     ["(((10)))", 10],
     ["3 * 5", 15],
-    ["-7 * -(6 / 3)", 14]
+    ["-7 * -(6 / 3)", 14],
+    ['50+2*3', 56],
+    ['(50+2)*3', 156]
   ];
 
-  for (int j = 0; j < tests.length; j++) {
-    print(
-        "${tests[j]} = ${(calc(tests[j][0] as String) == tests[j][1] as num ? true : false)}");
+  for (List ls in tests) {
+    if ('${calc(ls[0])}' == '${ls[1]}') {
+      print('testing for ${ls[0]} - \x1B[32mPASS\x1B[0m');
+    } else {
+      print('testing for ${ls[0]} - \x1B[31mFAILED\x1B[0m');
+      print('expected ${ls[1]} - got ${calc(ls[0])}');
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-void main(){
+void main() {
 /*
   https://www.codewars.com/kata/52a78825cdfc2cfc87000005/train/dart
 
@@ -34,63 +34,57 @@ void main(){
     "(((10)))" = 10
 
 */
-String str = "6/2*(1+(2))";
+  String str = "6/2*(1+(2))";
 //print(str);
 //print(parentheses(str));
 //print(calc(str));
 
 //print(addSub('35 + 2'));
-  
-test();
 
-}//end main
+  test();
+} //end main
 
 num calc(String s) => num.parse(parentheses(s));
 
 String parentheses(String s) {
-
-  if(!s.contains('(')) return addSub(multDiv(s));
-
-  int open = 0;
-  int close = 0;
+  if (!s.contains('(')) return addSub(multDiv(s));
+  int prths = 0;
   String tempS = '';
-  
-  for(int i =0; i< s.length;i++){
+
+  for (int i = 0; i < s.length; i++) {
     if (s[i] == '(' || s[i] == ')') {
-      s[i] == '(' ? open++ : close++;
-      
-      if( i > 0 && s[i] == '('){
-        if(isNum(s[i-1])){
-          tempS += '*';
-        }
+      if (s[i] == ')')
+        prths--;
+      else {
+        prths++;
+        if (i > 0 && isNum(s[i - 1])) tempS += '*';
       }
     }
     tempS += s[i];
   }
 
-  if(open!=close) return 'invalid';
-  
+  if (prths != 0) return 'invalid';
+
   s = tempS;
 
-  int lastOpenPar = s.lastIndexOf('(')+1;
+  int lastOpenPar = s.lastIndexOf('(') + 1;
   int firstClosePar = s.substring(lastOpenPar).indexOf(')');
-  String betweenPar = s.substring(lastOpenPar, firstClosePar+lastOpenPar);
+  String betweenPar = s.substring(lastOpenPar, firstClosePar + lastOpenPar);
 
   s = s.replaceAll('($betweenPar)', '${addSub(multDiv(betweenPar))}');
-  if(s.contains('(')){
+  if (s.contains('(')) {
     s = parentheses(s);
   }
 
   return addSub(multDiv(s));
 }
 
-bool isNum(String s)=> '0123456789'.contains(s);
-
+bool isNum(String s) => '0123456789'.contains(s);
 
 String addSub(String expression) {
   //goes through a string and either adds or subtracts the next value
   //returns the sum of all operations
-  List expr = cleaner(expression).split(' ');
+  List expr = cleaner(expression);
   num result = 0;
 
   for (int i = 0; i < expr.length; i++) {
@@ -106,55 +100,51 @@ String addSub(String expression) {
   return result.toString();
 }
 
-
 String multDiv(String s) {
   //goes through a string and executes all multiplications and divisions within it
   //while preserving all other symbols such as parentheses and/or sum/sub
-  List expr = cleaner(s).split(' ');
+  List expr = cleaner(s);
   List result = [];
 
   for (int i = 0; i < expr.length; i++) {
-    
-    if(expr[i] == '*' || expr[i] == '/'){
-      num tempNum = expr[i + 1] == '-' ? num.parse(expr[i + 2]) * -1 : num.parse(expr[i + 1]);
-      
+    if (expr[i] == '*' || expr[i] == '/') {
+      num tempNum = expr[i + 1] == '-'
+          ? num.parse(expr[i + 2]) * -1
+          : num.parse(expr[i + 1]);
+
       if (expr[i] == '/') {
         result.last = (num.parse(result.last) / tempNum).toString();
 
         if (num.parse(result.last) - num.parse(result.last).toInt() == 0) {
           result.last = num.parse(result.last).toInt().toString();
         }
-      } else{
+      } else {
         result.last = (num.parse(result.last) * tempNum).toString();
       }
       expr[i + 1] == '-' ? i += 2 : i++;
-    }else {
+    } else {
       result.add(expr[i]);
     }
   }
   return result.join(' ');
 }
 
-String cleaner(String s) {
+List cleaner(String s) {
   //removes all unecessary and/or redundant characters in string
-  s[0] == '(' ? s = '0' + s : s;
-  s = s.replaceAll(' ', '');
-  s = s.replaceAll('()', '');
-  s = s.replaceAll('--', '+');
-  s = s.replaceAll('-+ ', '-');
-  s = s.replaceAll('+-', '-');
+  //returns a list with all separated elements
+  s[0] == '(' ? s = '0+' + s : s;
+  s = s
+      .replaceAll(' ', '')
+      .replaceAll('()', '')
+      .replaceAll('--', '+')
+      .replaceAll('-+ ', '-')
+      .replaceAll('+-', '-')
+      .split('')
+      .map((e) => e = '0123456789.'.contains(e) ? e : ' ${e} ')
+      .join();
 
-  String isolated_ = '';
-
-  s.split('').forEach((char) {
-    '0123456789.'.contains(char) ? isolated_ += char : isolated_ += ' ${char} ';
-  });
-  isolated_ = isolated_.replaceAll('  ', ' ').trim();
-
-  return isolated_;
+  return s.replaceAll('  ', ' ').trim().split(' ');
 }
-
-
 
 void test() {
   var tests = [
@@ -170,7 +160,9 @@ void test() {
     ["3 * 5", 15],
     ["-7 * -(6 / 3)", 14],
     ['50+2*3', 56],
-    ['(50+2)*3', 156]
+    ['(50+2)*3', 156],
+    ['.5*3', 1.5],
+    ['3*.5', 1.5],
   ];
 
   for (List ls in tests) {
@@ -182,4 +174,3 @@ void test() {
     }
   }
 }
-

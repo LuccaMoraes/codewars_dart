@@ -1,37 +1,52 @@
 void main() {
 /*
-  https://www.codewars.com/kata/52a78825cdfc2cfc87000005/train/dart
 
-  Evaluate mathematical expression
+It's a recursive function that evaluates mathematical expressions containing the
+basic arithmetic operators, parentheses, and decimal numbers.
 
-  2kyu !!!!!!!!!!!
+The function parentheses takes a string s as input and checks if there are any 
+parentheses in it. If there are no parentheses, it calls the function 
+addSub(multDiv(s)) which evaluates the expression without parentheses. If there
+are parentheses, it loops through the string character by character and builds a
+new string tempS that replaces the content between each pair of parentheses with
+its result obtained by calling addSub(multDiv(betweenPar)) recursively. It then
+continues to the next pair of parentheses until there are no more left.
 
-  Multiplication *
-  Division / (as floating point division)
-  Addition +
-  Subtraction -
-  
-  Must support multiple levels of nested parentheses
-  (2 / (2 + 3.33) * 4) - -6
+The functions addSub and multDiv evaluate the expression by first cleaning up
+the input string with the function cleaner. The cleaner function removes all
+unnecessary and redundant characters from the input string and returns a list of
+separated elements. The addSub function goes through the list and either adds or
+subtracts the next value depending on the current operator. The multDiv function
+goes through the list and executes all multiplications and divisions while
+preserving all other symbols such as parentheses and/or sum/sub.
+
+Finally, the function calc calls the parentheses function with the input string
+s and returns the result as a number.
 
 
-  characters: 0-9 *-+/() 
+
+There are some ways the code could be refactored to improve readability and 
+maintainability:
+
+1. Instead of using a mix of num and String types throughout the code, it would
+ be better to stick to one type consistently. In this case, it might be better to
+ use double throughout since the input and output are both floating-point 
+ numbers.
+
+2. It might be better to break the parentheses function into smaller, more
+ focused functions that perform specific tasks. For example, one function to
+ extract the innermost parentheses, another to evaluate a given expression, etc.
+ This would make the code more modular and easier to test.
+
+3. The cleaner function could be simplified by chaining multiple string
+ transformations together using the replaceAll method. For example, instead of 
+ chaining together multiple replaceAll calls, we could use one replaceAll call 
+ with a regular expression to replace all unnecessary characters.
+
+4. We could use double.tryParse instead of num.parse to avoid errors when
+ parsing invalid strings.
 
 
-
-  Steps to solution:
-  1. Create a cleaner function: DONE
-    "2 - - 6" => "2 + 6"
-  2. Create a function that can resolve a simple +- imput: DONE
-    "45 + 2" => 47
-  3. Create a function that can resolve a simple *+-/ imput: DONE
-    "2 + 35 * 9 - 100 / 2" => 267
-  4. Create a function that support parentheses: DONE
-    "2 * (5 + 2)" => 14
-  5. Create a function that support nested parentheses:
-    "2 * (5 + (1+1)-1) - (-5*2)" = 22
-    "0+(2 / (2 + 3.33) * 4) - -6" = 7,500938086
-    "(((10)))" = 10
 
 */
   String str = "6/2*(1+(2))";
@@ -47,15 +62,16 @@ void main() {
 num calc(String s) => num.parse(parentheses(s));
 
 String parentheses(String s) {
+  // skips this function if no parentheses are found
   if (!s.contains('(')) return addSub(multDiv(s));
   int prths = 0;
   String tempS = '';
 
   for (int i = 0; i < s.length; i++) {
     if (s[i] == '(' || s[i] == ')') {
-      if (s[i] == ')')
+      if (s[i] == ')') {
         prths--;
-      else {
+      } else {
         prths++;
         if (i > 0 && isNum(s[i - 1])) tempS += '*';
       }
@@ -63,22 +79,22 @@ String parentheses(String s) {
     tempS += s[i];
   }
 
-  if (prths != 0) return 'invalid';
-
   s = tempS;
 
-  int lastOpenPar = s.lastIndexOf('(') + 1;
-  int firstClosePar = s.substring(lastOpenPar).indexOf(')');
-  String betweenPar = s.substring(lastOpenPar, firstClosePar + lastOpenPar);
+  // Locates the first math espression between parentheses without any
+  // parentheses within it
+  String betweenPar = (RegExp(r'\([^\(\)]+\)').firstMatch(s)![0]!);
 
-  s = s.replaceAll('($betweenPar)', '${addSub(multDiv(betweenPar))}');
+  // Removes the parentheses from both start and end, saving a clean expression
+  betweenPar = betweenPar.replaceAll(RegExp(r'[\(\)]'), '');
+
+  s = s.replaceAll('($betweenPar)', addSub(multDiv(betweenPar)));
   if (s.contains('(')) {
     s = parentheses(s);
   }
 
   return addSub(multDiv(s));
 }
-
 bool isNum(String s) => '0123456789'.contains(s);
 
 String addSub(String expression) {
@@ -228,49 +244,3 @@ double engine(String str) {
   }
   return number1;
 }
-/*
-double? calc2(String? expression) {
-  if (expression == null) {
-    return null;
-  }
-  expression = expression.replaceAll(" ", "");
-  while (expression.contains("(")) {
-    String sub = expression.substring(0,expression.indexOf(")"));
-    sub = sub.substring(sub.lastIndexOf("(")+1);
-    expression = expression.replaceAll("($sub)", '${engine(sub)}');
-  }
-  return engine(expression);
-}
-
-double engine2(String? str) {
-  if (str == null) {
-    return 0.0;
-  }
-  str = str.replaceAll("--","+").replaceAll("+-","-");
-  str += "+";
-  String number = str[0];
-  String operator1 = "", operator2 = "";
-  double? number1, number2;
-  for (int b = 1; b <= str.length; b++) {
-    if (!["-","+","*","/"].contains(str[b])) number += str[b];
-    else {
-      double? number3 = double.tryParse(number);
-      if (number3 == null) {
-        return 0.0;
-      }
-      if (operator2 == "") number2 = number3;
-      else operator2 == "*" ? number2 *= number3 : number2 /= number3;
-      if (str[b] == "+" || str[b] == "-") {
-        if (operator1 == "") number1 = number2;
-        else operator1 == "+" ? number1! += number2! : number1! -= number2!;
-        operator1 = str[b];
-        operator2 = "";
-      }
-      else operator2 = str[b];
-      b++;
-      if (b < str.length) number = str[b];
-    }
-  }
-  return number1 ?? 0.0;
-}
-*/

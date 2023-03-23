@@ -47,15 +47,16 @@ void main() {
 num calc(String s) => num.parse(parentheses(s));
 
 String parentheses(String s) {
+  // skips this function if no parentheses are found
   if (!s.contains('(')) return addSub(multDiv(s));
   int prths = 0;
   String tempS = '';
 
   for (int i = 0; i < s.length; i++) {
     if (s[i] == '(' || s[i] == ')') {
-      if (s[i] == ')')
+      if (s[i] == ')') {
         prths--;
-      else {
+      } else {
         prths++;
         if (i > 0 && isNum(s[i - 1])) tempS += '*';
       }
@@ -63,22 +64,22 @@ String parentheses(String s) {
     tempS += s[i];
   }
 
-  if (prths != 0) return 'invalid';
-
   s = tempS;
 
-  int lastOpenPar = s.lastIndexOf('(') + 1;
-  int firstClosePar = s.substring(lastOpenPar).indexOf(')');
-  String betweenPar = s.substring(lastOpenPar, firstClosePar + lastOpenPar);
+  // Locates the first math espression between parentheses without any
+  // parentheses within it
+  String betweenPar = (RegExp(r'\([^\(\)]+\)').firstMatch(s)![0]!);
 
-  s = s.replaceAll('($betweenPar)', '${addSub(multDiv(betweenPar))}');
+  // Removes the parentheses from both start and end, saving a clean expression
+  betweenPar = betweenPar.replaceAll(RegExp(r'[\(\)]'), '');
+
+  s = s.replaceAll('($betweenPar)', addSub(multDiv(betweenPar)));
   if (s.contains('(')) {
     s = parentheses(s);
   }
 
   return addSub(multDiv(s));
 }
-
 bool isNum(String s) => '0123456789'.contains(s);
 
 String addSub(String expression) {
@@ -228,49 +229,3 @@ double engine(String str) {
   }
   return number1;
 }
-/*
-double? calc2(String? expression) {
-  if (expression == null) {
-    return null;
-  }
-  expression = expression.replaceAll(" ", "");
-  while (expression.contains("(")) {
-    String sub = expression.substring(0,expression.indexOf(")"));
-    sub = sub.substring(sub.lastIndexOf("(")+1);
-    expression = expression.replaceAll("($sub)", '${engine(sub)}');
-  }
-  return engine(expression);
-}
-
-double engine2(String? str) {
-  if (str == null) {
-    return 0.0;
-  }
-  str = str.replaceAll("--","+").replaceAll("+-","-");
-  str += "+";
-  String number = str[0];
-  String operator1 = "", operator2 = "";
-  double? number1, number2;
-  for (int b = 1; b <= str.length; b++) {
-    if (!["-","+","*","/"].contains(str[b])) number += str[b];
-    else {
-      double? number3 = double.tryParse(number);
-      if (number3 == null) {
-        return 0.0;
-      }
-      if (operator2 == "") number2 = number3;
-      else operator2 == "*" ? number2 *= number3 : number2 /= number3;
-      if (str[b] == "+" || str[b] == "-") {
-        if (operator1 == "") number1 = number2;
-        else operator1 == "+" ? number1! += number2! : number1! -= number2!;
-        operator1 = str[b];
-        operator2 = "";
-      }
-      else operator2 = str[b];
-      b++;
-      if (b < str.length) number = str[b];
-    }
-  }
-  return number1 ?? 0.0;
-}
-*/

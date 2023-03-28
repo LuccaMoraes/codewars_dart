@@ -1,3 +1,5 @@
+import 'dart:math';
+
 void main() {
 /*
 
@@ -59,9 +61,9 @@ maintainability:
   //print(str);
 }
 
-num calc(String s) => num.parse(parentheses(s));
+num calc(String s) => num.parse(evaluateParentheses(s));
 
-String parentheses(String s) {
+String evaluateParentheses(String s) {
   // skips this function if no parentheses are found
   if (!s.contains('(')) return addSub(multDiv(s));
 
@@ -72,17 +74,23 @@ String parentheses(String s) {
   s = multiplicationBeforeParentheses(s);
 
   // Locates the first math expr between () without any () within it
-  String innermostExpr = RegExp(r'\([^\(\)]+\)').firstMatch(s)![0]!;
+  final String inner = innermostExpression(s);
 
-  // Removes the parentheses from both start and end, saving a clean expression
-  innermostExpr = innermostExpr.substring(1, innermostExpr.length - 1);
+  s = s.replaceAll('($inner)', addSub(multDiv(inner)));
 
-  s = s.replaceAll('($innermostExpr)', addSub(multDiv(innermostExpr)));
   if (s.contains('(')) {
-    s = parentheses(s);
+    s = evaluateParentheses(s);
   }
 
   return addSub(multDiv(s));
+}
+
+String innermostExpression(String s){
+  // Locates the first math expr between () without any () within it
+  String innermostExpr = RegExp(r'\([^\(\)]+\)').firstMatch(s)![0]!;
+
+  // Removes the parentheses from both start and end, saving a clean expression
+  return innermostExpr.substring(1, innermostExpr.length - 1);
 }
 
 String multiplicationBeforeParentheses(String s) {
@@ -174,9 +182,9 @@ void test() {
     ['2(1+2)', 6],
     ["1 + 1", 2],
     ["8/16", 0.5],
-    ["3 -(-1)", 4],
-    ["2 + -2", 0],
-    ["10- 2- -5", 13],
+    ["3-(-1)", 4],
+    ["2+-2", 0],
+    ["10-2--5", 13],
     ["(((10)))", 10],
     ["3 * 5", 15],
     ["-7 * -(6 / 3)", 14],
@@ -184,14 +192,15 @@ void test() {
     ['(50+2)*3', 156],
     ['.5*3', 1.5],
     ['3*.5', 1.5],
+    ['(((((((((1+5642)*3656)/44546)-669005)*09096)+7134)-(((((8-4569)/456)+12721)*17569882)-17897893))*11344)/13245235)+16345345', -180121098.42022455],
   ];
 
   for (List ls in tests) {
-    if ('${codewarsSolution(ls[0])}' == '${ls[1]}') {
+    if ('${evaluateExpression(ls[0])}' == '${ls[1]}') {
       print('testing for ${ls[0]} - \x1B[32mPASS\x1B[0m');
     } else {
       print('testing for ${ls[0]} - \x1B[31mFAILED\x1B[0m');
-      print('expected ${ls[1]} - got ${codewarsSolution(ls[0])}');
+      print('expected ${ls[1]} - got ${evaluateExpression(ls[0])}');
     }
   }
 }
@@ -317,4 +326,64 @@ double engine(String str) {
   // Return the final value of "number1", which should be the result of the
   // expression evaluation.
   return number1;
+}
+
+
+double evaluateExpression(String expression) {
+  // Remove any whitespace from the expression
+  expression = expression.replaceAll(' ', '');
+
+  // Evaluate any subexpressions inside parentheses
+  while (expression.contains('(')) {
+    RegExp exp = RegExp(r'\([^\(\)]+\)');
+    String innermostExpr = exp.firstMatch(expression)![0]!;
+    String innerResult = evaluateExpression(innermostExpr.substring(1, innermostExpr.length - 1)).toString();
+    expression = expression.replaceFirst(innermostExpr, innerResult);
+  }
+
+  // Evaluate exponentiation
+  while (expression.contains('^')) {
+    RegExp exp = RegExp(r'\d+(\.\d+)?\^\d+(\.\d+)?');
+    String match = exp.firstMatch(expression)![0]!;
+    List<String> operands = match.split('^');
+    double base = double.parse(operands[0]);
+    double exponent = double.parse(operands[1]);
+    String result = pow(base, exponent).toString();
+    expression = expression.replaceFirst(match, result);
+  }
+
+  // Evaluate multiplication and division
+  while (expression.contains('*') || expression.contains('/')) {
+    RegExp exp = RegExp(r'\d+(\.\d+)?[*/]\d+(\.\d+)?');
+    String match = exp.firstMatch(expression)![0]!;
+    List<String> operands = match.split(new RegExp('[*/]'));
+    double a = double.parse(operands[0]);
+    double b = double.parse(operands[1]);
+    String result;
+    if (match.contains('*')) {
+      result = (a * b).toString();
+    } else {
+      result = (a / b).toString();
+    }
+    expression = expression.replaceFirst(match, result);
+  }
+
+  // Evaluate addition and subtraction
+  while (expression.contains('+') || expression.contains('-')) {
+    RegExp exp = RegExp(r'\d+(\.\d+)?[+\-]\d+(\.\d+)?');
+    String match = exp.firstMatch(expression)![0]!;
+    List<String> operands = match.split(new RegExp('[+\-]'));
+    double a = double.parse(operands[0]);
+    double b = double.parse(operands[1]);
+    String result;
+    if (match.contains('+')) {
+      result = (a + b).toString();
+    } else {
+      result = (a - b).toString();
+    }
+    expression = expression.replaceFirst(match, result);
+  }
+
+  // Return the final result as a double
+  return double.parse(expression);
 }

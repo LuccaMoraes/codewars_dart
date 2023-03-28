@@ -29,8 +29,8 @@ There are some ways the code could be refactored to improve readability and
 maintainability:
 
 1. Instead of using a mix of num and String types throughout the code, it would
- be better to stick to one type consistently. In this case, it might be better to
- use double throughout since the input and output are both floating-point 
+ be better to stick to one type consistently. In this case, it might be better 
+ to use double throughout since the input and output are both floating-point 
  numbers.
 
 2. It might be better to break the parentheses function into smaller, more
@@ -49,52 +49,57 @@ maintainability:
 
 
 */
-  String str = "6/2*(1+(2))";
-//print(str);
-//print(parentheses(str));
-//print(calc(str));
+  String str = "abcde";
 
-//print(addSub('35 + 2'));
+  //print(str);
+  //print(parentheses(str));
+  //print(calc(str));
 
   test();
-} //end main
+  //print(str);
+}
 
 num calc(String s) => num.parse(parentheses(s));
 
 String parentheses(String s) {
   // skips this function if no parentheses are found
   if (!s.contains('(')) return addSub(multDiv(s));
-  int prths = 0;
-  String tempS = '';
 
-  for (int i = 0; i < s.length; i++) {
-    if (s[i] == '(' || s[i] == ')') {
-      if (s[i] == ')') {
-        prths--;
-      } else {
-        prths++;
-        if (i > 0 && isNum(s[i - 1])) tempS += '*';
-      }
-    }
-    tempS += s[i];
-  }
+  // returns error if the amount of '(' and ')' is not the same
+  if ('('.allMatches(s).length != ')'.allMatches(s).length) return 'invalid';
 
-  s = tempS;
+  // replaces all 'n(' with 'n*('
+  s = multiplicationBeforeParentheses(s);
 
-  // Locates the first math espression between parentheses without any
-  // parentheses within it
-  String betweenPar = (RegExp(r'\([^\(\)]+\)').firstMatch(s)![0]!);
+  // Locates the first math expr between () without any () within it
+  String innermostExpr = RegExp(r'\([^\(\)]+\)').firstMatch(s)![0]!;
 
   // Removes the parentheses from both start and end, saving a clean expression
-  betweenPar = betweenPar.replaceAll(RegExp(r'[\(\)]'), '');
+  innermostExpr = innermostExpr.substring(1, innermostExpr.length - 1);
 
-  s = s.replaceAll('($betweenPar)', addSub(multDiv(betweenPar)));
+  s = s.replaceAll('($innermostExpr)', addSub(multDiv(innermostExpr)));
   if (s.contains('(')) {
     s = parentheses(s);
   }
 
   return addSub(multDiv(s));
 }
+
+String multiplicationBeforeParentheses(String s) {
+  // replaces all '(' preceded with a digit with '*('
+  if (s.contains(RegExp(r'\d\('))) {
+    final int temp = s.indexOf(RegExp(r'\d\(')) + 1;
+    s = s.replaceRange(temp, temp + 1, '*(');
+
+    // recursively replaces all 'n(' with 'n*(' if necessary
+    if (s.contains(RegExp(r'\d\('))) {
+      s = multiplicationBeforeParentheses(s);
+    }
+  }
+
+  return s;
+}
+
 bool isNum(String s) => '0123456789'.contains(s);
 
 String addSub(String expression) {
@@ -182,32 +187,31 @@ void test() {
   ];
 
   for (List ls in tests) {
-    if ('${calc(ls[0])}' == '${ls[1]}') {
+    if ('${codewarsSolution(ls[0])}' == '${ls[1]}') {
       print('testing for ${ls[0]} - \x1B[32mPASS\x1B[0m');
     } else {
       print('testing for ${ls[0]} - \x1B[31mFAILED\x1B[0m');
-      print('expected ${ls[1]} - got ${calc(ls[0])}');
+      print('expected ${ls[1]} - got ${codewarsSolution(ls[0])}');
     }
   }
 }
 
-
 codewarsSolution(String expression) {
   expression = expression.replaceAll(" ", "");
   while (expression.contains("(")) {
-    String sub = expression.substring(0,expression.indexOf(")"));
-    sub = sub.substring(sub.lastIndexOf("(")+1);
+    String sub = expression.substring(0, expression.indexOf(")"));
+    sub = sub.substring(sub.lastIndexOf("(") + 1);
     expression = expression.replaceAll("($sub)", '${engine(sub)}');
   }
 
-  if(engine(expression)- engine(expression).toInt() == 0){
+  if (engine(expression) - engine(expression).toInt() == 0) {
     return engine(expression).toInt();
   }
 
   return engine(expression);
 }
 
-double engine(String str) {
+double engineOG(String str) {
   str = str.replaceAll("--", "+").replaceAll("+-", "-");
   str += "+";
   String number = str[0];
@@ -219,7 +223,7 @@ double engine(String str) {
       number += str[b];
     } else {
       double number3 = double.parse(number);
-      
+
       if (operator2 == "") {
         number2 = number3;
       } else {
@@ -242,5 +246,75 @@ double engine(String str) {
       if (b < str.length) number = str[b];
     }
   }
+  return number1;
+}
+
+double engine(String str) {
+  // This function was commented by chatGPT
+  // This function takes a mathematical expression as a String input and evaluates
+  // it to a double-precision floating-point number.
+
+  // Replace all instances of "--" with "+", and all instances of "+-" with "-".
+  str = str.replaceAll("--", "+").replaceAll("+-", "-");
+
+  // Append a "+" to the end of the string to ensure that the final number is
+  //parsed correctly.
+  str += "+";
+
+  // Initialize some variables.
+  String number = str[0]; // The first number in the expression.
+  String operator1 = ""; // The first operator encountered in the expression.
+  String operator2 = ""; // The second operator encountered in the expression.
+  double number1 = 0; // The first number encountered in the expression.
+  double number2 = 0; // The second number encountered in the expression.
+
+  // Iterate through the input string character by character.
+  for (int b = 1; b <= str.length; b++) {
+    // If the current character is a digit or a decimal point, add it to the
+    // "number" variable.
+    if (!"-+*/".contains(str[b])) {
+      number += str[b];
+    }
+
+    // If the current character is an operator, perform the appropriate operation.
+    else {
+      // Convert the "number" string variable to a double.
+      double number3 = double.parse(number);
+
+      // If "operator2" is empty, set "number2" to "number3".
+      // Otherwise, perform the appropriate operation based on the value of "operator2".
+      if (operator2 == "") {
+        number2 = number3;
+      } else {
+        operator2 == "*" ? number2 *= number3 : number2 /= number3;
+      }
+
+      // If the current operator is "+" or "-", perform the appropriate operation.
+      // Update "operator1" to the current operator and "operator2" to an empty string.
+      if (str[b] == "+" || str[b] == "-") {
+        if (operator1 == "") {
+          number1 = number2;
+        } else {
+          operator1 == "+" ? number1 += number2 : number1 -= number2;
+        }
+        operator1 = str[b];
+        operator2 = "";
+      }
+
+      // If the current operator is "*" or "/", set "operator2" to the current
+      // operator and skip the next character.
+      else {
+        operator2 = str[b];
+      }
+      b++;
+
+      // If the next character is not an operator, start a new "number"
+      // variable with it.
+      if (b < str.length) number = str[b];
+    }
+  }
+
+  // Return the final value of "number1", which should be the result of the
+  // expression evaluation.
   return number1;
 }

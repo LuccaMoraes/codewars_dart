@@ -1,3 +1,5 @@
+import 'dart:math';
+
 void main() {
   /// 1 kyu challenge from: https://www.codewars.com/kata/59568be9cc15b57637000054/dart
   /// Possible mathematical solution to the problem: https://cs.stackexchange.com/questions/110414/can-i-simplify-successive-xor-operations
@@ -63,30 +65,24 @@ int elderAge(int m, int n, int l, int t) {
   if (m == 0 || n == 0) {
     return 0;
   }
-
   if (m > n) {
-    int temp = n;
-    n = m;
-    m = temp;
+    m ^= n;
+    n ^= m;
+    m ^= n;
   }
-
-  int lm = largerPow(m);
-  int ln = largerPow(n);
-
+  int lm = largerPow(m), ln = largerPow(n);
   if (l > ln) {
     return 0;
   }
-
   if (lm == ln) {
     return (rangeSum(1, ln - l - 1) * (m + n - ln) +
             elderAge(ln - n, lm - m, l, t)) %
         t;
   }
-
   if (lm < ln) {
     lm = ln ~/ 2;
     int tmp = rangeSum(1, ln - l - 1) * m -
-        (ln - n) * rangeSum(lm - l < 0 ? 0 : lm - l, ln - l - 1);
+        (ln - n) * rangeSum(lm - l > 0 ? lm - l : 0, ln - l - 1);
     if (l <= lm) {
       tmp += (lm - l) * (lm - m) * (ln - n) + elderAge(lm - m, ln - n, 0, t);
     } else {

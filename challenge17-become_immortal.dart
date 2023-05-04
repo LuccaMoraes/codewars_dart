@@ -1,59 +1,29 @@
 void main() {
   /// 1 kyu challenge from: https://www.codewars.com/kata/59568be9cc15b57637000054/dart
 
-  print(elderAge(8, 5, 1, 100));
+  //print(elderAge(8, 5, 1, 100));
+
+  int a = 28827050410;
+  int b = 35165045587;
+
+  //print(((a ^ b)-1)%100);
+
+  //newMagicRectangle(100000, 10000);
 
   test();
 }
 
 int elderAge(int m, int n, int l, int t) {
-  List<List<int>> magicRectangle = newMagicRectangle(m, n);
-  List<List<int>> afterLoss = donationLoss(magicRectangle, l);
-  int sum = sumOfDonations(afterLoss);
+  int sum = 0;
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < m; j++) {
+      int temp = (i ^ j)-l;
+      sum += temp <= 0 ? 0 : temp; 
+    }
+  }
   return sum % t;
 }
 
-int sumOfDonations(List<List<int>> rectangle) {
-  int sum = 0;
-  for (int i = 0; i < rectangle.length; i++) {
-    for (int j = 0; j < rectangle[i].length; j++) {
-      sum += rectangle[i][j];
-    }
-  }
-
-  return sum;
-}
-
-List<List<int>> donationLoss(List<List<int>> magicRectangle, int l) {
-  List<List<int>> afterLoss = [];
-
-  for (int i = 0; i < magicRectangle.length; i++) {
-    List<int> temp = [];
-
-    for (int j = 0; j < magicRectangle[i].length; j++) {
-      if (magicRectangle[i][j] - l <= 0) {
-        temp.add(0);
-      } else {
-        temp.add(magicRectangle[i][j] - l);
-      }
-    }
-    afterLoss.add(temp);
-  }
-  return afterLoss;
-}
-
-List<List<int>> newMagicRectangle(int m, int n) {
-  List<List<int>> magicRectangle = [];
-
-  for (int i = 0; i < n; i++) {
-    List<int> tempRow = [];
-    for (int j = 0; j < m; j++) {
-      tempRow.add(i ^ j);
-    }
-    magicRectangle.add(tempRow);
-  }
-  return magicRectangle;
-}
 
 void test() {
   print(elderAge(8, 5, 1, 100) == 5);

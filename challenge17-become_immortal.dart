@@ -37,8 +37,6 @@ def elder_age(m,n,l,t):
 
 */
 
-
-
   //print(elderAge(8, 5, 1, 100));
 
   int a = 28827050410;
@@ -65,23 +63,30 @@ int elderAge(int m, int n, int l, int t) {
   if (m == 0 || n == 0) {
     return 0;
   }
+
   if (m > n) {
-    m ^= n;
-    n ^= m;
-    m ^= n;
+    int temp = n;
+    n = m;
+    m = temp;
   }
+
   int lm = largerPow(m);
   int ln = largerPow(n);
+
   if (l > ln) {
     return 0;
   }
+
   if (lm == ln) {
-    return (rangeSum(1, ln - l - 1) * (m + n - ln) + elderAge(ln - n, lm - m, l, t)) % t;
+    return (rangeSum(1, ln - l - 1) * (m + n - ln) +
+            elderAge(ln - n, lm - m, l, t)) %
+        t;
   }
-  else{
-  //if (lm < ln) {
+
+  if (lm < ln) {
     lm = ln ~/ 2;
-    int tmp = rangeSum(1, ln - l - 1) * m - (ln - n) * rangeSum(lm - l < 0 ? 0 : lm - l, ln - l - 1);
+    int tmp = rangeSum(1, ln - l - 1) * m -
+        (ln - n) * rangeSum(lm - l < 0 ? 0 : lm - l, ln - l - 1);
     if (l <= lm) {
       tmp += (lm - l) * (lm - m) * (ln - n) + elderAge(lm - m, ln - n, 0, t);
     } else {
@@ -89,25 +94,23 @@ int elderAge(int m, int n, int l, int t) {
     }
     return tmp % t;
   }
+  return 0;
 }
 
-
 int elderAge1(int m, int n, int l, int t) {
+  if (m == 28827050410) return 5456283;
+  int smaller = m > n ? n : m;
+  int larger = m < n ? n : m;
 
-  if(m == 28827050410) return 5456283;
-  int smaller = m > n? n : m;
-  int larger = m < n? n : m;
-  
   int sum = 0;
   for (int i = 0; i < smaller; i++) {
     for (int j = 0; j < larger; j++) {
-      int temp = (i ^ j)-l;
-      sum += temp <= 0 ? 0 : temp; 
+      int temp = (i ^ j) - l;
+      sum += temp <= 0 ? 0 : temp;
     }
   }
   return sum % t;
 }
-
 
 void test() {
   print(elderAge(8, 5, 1, 100) == 5);
